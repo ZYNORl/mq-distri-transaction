@@ -1,0 +1,53 @@
+server:
+  port: 8001
+spring:
+  application:
+    name: fund-payment-server
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    url:  jdbc:mysql://localhost:3306/tran?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false
+    username: root
+    password: root
+  cloud:
+    nacos:
+      discovery:
+        server-addr:  124.220.36.202:8848
+  kafka:
+    bootstrap-servers:  121.43.116.232:9092
+    producer:
+      retries: 0
+      batch-size: 16384
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        linger.ms: 1
+  quartz:
+    #持久化到数据库方式
+    job-store-type: jdbc
+    initialize-schema: embedded
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: MyScheduler
+            instanceId: AUTO
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_
+            isClustered: true
+            clusterCheckinInterval: 10000
+            useProperties: false
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*Mapper.xml
+  global-config:
+    db-config:
+      id-type: auto
