@@ -20,11 +20,14 @@
         <java.version>11</java.version>
         <spring-cloud-alibaba-dependencies>2.1.0.RELEASE</spring-cloud-alibaba-dependencies>
         <com.baomido.version>3.5.3.2</com.baomido.version>
+        <org.freemarker.version>2.3.28</org.freemarker.version>
+        <io.springfox.swagger.version>2.7.0</io.springfox.swagger.version>
         <skipTests>true</skipTests>
     </properties>
     <modules>
         <module>fund-payment</module>
         <module>fund-collection</module>
+        <module>common</module>
     </modules>
     <dependencyManagement>
         <dependencies>
@@ -34,6 +37,29 @@
                 <version>${spring-cloud-alibaba-dependencies}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- mybatis-plus-generator -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId>
+                <version>${com.baomido.version}</version>
+            </dependency>
+            <!--配合上面的代码生成器使用-->
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>${org.freemarker.version}</version>
+            </dependency>
+            <!--Swagger-UI API文档生产工具-->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${io.springfox.swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${io.springfox.swagger.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
