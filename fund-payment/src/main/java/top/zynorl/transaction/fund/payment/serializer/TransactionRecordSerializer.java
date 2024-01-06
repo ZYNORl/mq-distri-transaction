@@ -1,13 +1,13 @@
 package top.zynorl.transaction.fund.payment.serializer;
 
 
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import org.apache.commons.lang3.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
 import top.zynorl.transaction.fund.collection.sqlServer.entity.TransactionRecordDO;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -23,12 +23,17 @@ public class TransactionRecordSerializer implements Serializer<TransactionRecord
 
     @Override
     public byte[] serialize(String topic, TransactionRecordDO data) {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             ObjectOutputStream oos = new ObjectOutputStream(baos)) {
-            oos.writeObject(data);
-            return baos.toByteArray();
-        } catch (IOException e) {
-            throw new SerializationException("Error serializing TransactionRecordDO to byte array", e);
+        try {
+            // 将TransactionRecordDO对象转换为JSON字符串
+            String jsonStr = JSONUtil.toJsonStr(data);
+            // 确保json字符串不为空，并转为字节数组
+            if (StrUtil.isNotBlank(jsonStr)) {
+                return jsonStr.getBytes(StandardCharsets.UTF_8);
+            } else {
+                throw new SerializationException("Error serializing TransactionRecordDO to byte array as JSON, JSON string is empty");
+            }
+        } catch (Exception e) {
+            throw new SerializationException("Error serializing TransactionRecordDO to JSON string", e);
         }
     }
 

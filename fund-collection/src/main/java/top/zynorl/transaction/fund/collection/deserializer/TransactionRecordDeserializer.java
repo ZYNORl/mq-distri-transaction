@@ -1,13 +1,11 @@
 package top.zynorl.transaction.fund.collection.deserializer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import cn.hutool.json.JSONUtil;
 import org.apache.commons.lang3.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;
 import top.zynorl.transaction.fund.collection.sqlServer.entity.TransactionRecordDO;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -16,7 +14,7 @@ import java.util.Map;
  * @Date 2024/01/05
  **/
 public class TransactionRecordDeserializer implements Deserializer<TransactionRecordDO> {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
 
@@ -24,11 +22,12 @@ public class TransactionRecordDeserializer implements Deserializer<TransactionRe
 
     @Override
     public TransactionRecordDO deserialize(String topic, byte[] data) {
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(data);
-             ObjectInputStream ois = new ObjectInputStream(bais)) {
-            return (TransactionRecordDO) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new SerializationException("Error deserializing byte array to TransactionRecordDO", e);
+        try {
+            // 将字节数组还原为JSON字符串并反序列化为TransactionRecordDO对象
+            String jsonStr = new String(data, StandardCharsets.UTF_8);
+            return JSONUtil.toBean(jsonStr, TransactionRecordDO.class);
+        } catch (Exception e) {
+            throw new SerializationException("Error deserializing TransactionRecordDO from JSON", e);
         }
     }
 

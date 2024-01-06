@@ -16,7 +16,7 @@ import org.springframework.kafka.listener.ContainerProperties;
 @Configuration
 public class kafkaConf {
     /**
-     * MANUAL_IMMEDIATE 手动调用Acknowledgment.acknowledge()后立即提交
+     * MANUAL_IMMEDIATE 消费者手动确认并立即提交
      * @param consumerFactory
      * @return
      */

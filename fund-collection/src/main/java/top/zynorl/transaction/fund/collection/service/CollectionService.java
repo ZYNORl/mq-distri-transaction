@@ -1,6 +1,7 @@
 package top.zynorl.transaction.fund.collection.service;
 
-import org.quartz.SchedulerException;
+import top.zynorl.transaction.fund.collection.pojo.dto.TransactionAmountDataDTO;
+import top.zynorl.transaction.fund.collection.sqlServer.entity.TransactionRecordDO;
 
 /**
  * @version 1.0
@@ -8,10 +9,17 @@ import org.quartz.SchedulerException;
  * @Date 2024/01/05
  **/
 public interface CollectionService {
+
     /**
-     * bankcard2加上金额
-     * @param amount
-     * @return
+     * 根据事务id查询事务实体
      */
-    void addAmount(Double amount) throws SchedulerException;
+    TransactionRecordDO getTransactionByTranId(String tranUuid);
+
+    /**
+     * 入账处理
+     * @param tranId
+     * @param dataDTO
+     */
+    void doDeal(String tranId, TransactionAmountDataDTO dataDTO);
+
 }

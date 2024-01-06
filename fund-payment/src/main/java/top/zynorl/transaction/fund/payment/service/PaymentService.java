@@ -1,6 +1,6 @@
 package top.zynorl.transaction.fund.payment.service;
 
-import org.quartz.SchedulerException;
+import top.zynorl.transaction.fund.payment.pojo.req.DealAmountReq;
 
 /**
  * @version 1.0
@@ -9,9 +9,8 @@ import org.quartz.SchedulerException;
  **/
 public interface PaymentService {
     /**
-     * bankcard1减去金额
-     * @param amount
-     * @return
+     * 交易
+     * @param dealAmountReq
      */
-    void reduceAmount(Double amount) throws SchedulerException;
+    void doDeal(DealAmountReq dealAmountReq);
 }

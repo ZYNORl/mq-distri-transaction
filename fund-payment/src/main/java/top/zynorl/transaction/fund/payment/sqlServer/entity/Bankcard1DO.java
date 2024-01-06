@@ -28,14 +28,11 @@ public class Bankcard1DO implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
+    @ApiModelProperty("银行卡号")
+    private String cardNumber;
+
     @ApiModelProperty("银行卡余额")
     private Double amount;
-
-    @ApiModelProperty("单次交易额度")
-    private Double dealAmount;
-
-    @ApiModelProperty("交易时间")
-    private LocalDateTime dealTime;
 
     @ApiModelProperty("关联事务uuid")
     private String transactionId;

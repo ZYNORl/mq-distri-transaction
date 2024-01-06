@@ -3,7 +3,6 @@ package top.zynorl.transaction.fund.payment.scheduler;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -42,13 +41,13 @@ public class KafkaTransactionSchedulerTask {
                 public void onFailure(Throwable throwable) {
                     String Msg = String.format("事务id【%s】发送失败:%s", transactionRecordDO.getTransactionId(), throwable.getMessage());
                     log.error(Msg);
-                    throw new SchedulerException();
+                    throw new RuntimeException();
                 }
 
                 @Override
                 public void onSuccess(SendResult<String, Object> stringObjectSendResult) {
-                    transactionRecordDO.setStatus(TransactionStatusEnum.PUBLISHED.getCode());
-                    transactionRecordService.updateById(transactionRecordDO);
+                    String Msg = String.format("事务id【%s】发送成功", transactionRecordDO.getTransactionId());
+                    log.info(Msg);
                 }
             });
         });

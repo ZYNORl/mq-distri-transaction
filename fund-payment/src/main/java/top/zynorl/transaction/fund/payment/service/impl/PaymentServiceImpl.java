@@ -1,22 +1,19 @@
 package top.zynorl.transaction.fund.payment.service.impl;
 
+import cn.hutool.core.lang.UUID;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import top.zynorl.transaction.fund.payment.enums.TransactionStatusEnum;
+import top.zynorl.transaction.fund.payment.pojo.dto.TransactionAmountDataDTO;
+import top.zynorl.transaction.fund.payment.pojo.req.DealAmountReq;
 import top.zynorl.transaction.fund.payment.service.PaymentService;
 import top.zynorl.transaction.fund.payment.sqlServer.entity.Bankcard1DO;
-import top.zynorl.transaction.fund.payment.sqlServer.entity.Bankcard2DO;
 import top.zynorl.transaction.fund.payment.sqlServer.entity.TransactionRecordDO;
 import top.zynorl.transaction.fund.payment.sqlServer.service.IBankcard1DOService;
-import top.zynorl.transaction.fund.payment.sqlServer.service.IBankcard2DOService;
 import top.zynorl.transaction.fund.payment.sqlServer.service.ITransactionRecordService;
-
-import java.util.List;
-import java.util.UUID;
 
 /**
  * @version 1.0
@@ -31,21 +28,23 @@ public class PaymentServiceImpl implements PaymentService {
     private ITransactionRecordService transactionRecordService;
     @Override
     @Transactional
-    public void reduceAmount(Double amount) throws SchedulerException {
-        String transaction_id = UUID.randomUUID().toString();
+    public void doDeal(DealAmountReq dealAmountReq) {
+        String transactionId = UUID.randomUUID().toString(true);
         // 对bankcard1减去金额
-        QueryWrapper<Bankcard1DO> queryWrapperByOrder = new QueryWrapper<Bankcard1DO>().orderByDesc("deal_Time");
-        List<Bankcard1DO> bankcard1DOS = bankcard1DOService.list(queryWrapperByOrder);
-        if(!CollectionUtils.isEmpty(bankcard1DOS) && bankcard1DOS.get(0).getAmount()-amount>=0){
-            Bankcard1DO bankcard1DO = Bankcard1DO.builder()
-                    .dealAmount(amount).amount(bankcard1DOS.get(0).getAmount() - amount).transactionId(transaction_id).build();
+        Bankcard1DO bankcard1DO = bankcard1DOService.getOne(new QueryWrapper<Bankcard1DO>().eq("card_number", dealAmountReq.getCardNumber1()));
+        if(bankcard1DO!=null && bankcard1DO.getAmount()-dealAmountReq.getAmount()>=0){
+            bankcard1DO.setAmount(bankcard1DO.getAmount()-dealAmountReq.getAmount());
+            bankcard1DO.setTransactionId(transactionId);
             bankcard1DOService.save(bankcard1DO);
             // 对transactionRecord新增事务记录
+            TransactionAmountDataDTO dataDTO = TransactionAmountDataDTO.builder()
+                    .cardNumber1(dealAmountReq.getCardNumber1()).cardNumber2(dealAmountReq.getCardNumber2()).amount(dealAmountReq.getAmount()).build();
+            String jsonStrData = JSONUtil.toJsonStr(dataDTO);
             TransactionRecordDO transactionRecordDO = TransactionRecordDO.builder()
-                    .transactionId(transaction_id).data(amount.toString()).status(TransactionStatusEnum.STARTED.getCode()).build();
+                    .transactionId(transactionId).data(jsonStrData).status(TransactionStatusEnum.STARTED.getCode()).build();
             transactionRecordService.save(transactionRecordDO);
         }else{
-            throw new SchedulerException("银行卡1无金额或小于待操作amount："+amount);
+            throw new RuntimeException("无银行卡1信息或小于待操作amount："+dealAmountReq.getAmount());
         }
     }
 }
