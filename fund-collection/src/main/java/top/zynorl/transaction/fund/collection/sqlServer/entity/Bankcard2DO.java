@@ -2,6 +2,7 @@ package top.zynorl.transaction.fund.collection.sqlServer.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @Builder
+@TableName("bankcard2")
 @ApiModel(value = "Bankcard2对象", description = "银行卡2，用于收款")
 public class Bankcard2DO implements Serializable {
 

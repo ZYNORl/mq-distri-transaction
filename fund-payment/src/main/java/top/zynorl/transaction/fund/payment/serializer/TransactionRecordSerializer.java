@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import org.apache.commons.lang3.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
-import top.zynorl.transaction.fund.collection.sqlServer.entity.TransactionRecordDO;
+import top.zynorl.transaction.fund.payment.sqlServer.entity.TransactionRecordDO;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package top.zynorl.transaction.fund.payment.enums;
+package top.zynorl.transaction.fund.payment.pojo.enums;
 
 import lombok.Getter;
 

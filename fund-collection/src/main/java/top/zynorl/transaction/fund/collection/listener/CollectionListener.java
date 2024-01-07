@@ -7,12 +7,11 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
-import top.zynorl.transaction.fund.collection.enums.TransactionStatusEnum;
+import org.springframework.transaction.TransactionSystemException;
 import top.zynorl.transaction.fund.collection.pojo.dto.TransactionAmountDataDTO;
+import top.zynorl.transaction.fund.collection.pojo.enums.TransactionStatusEnum;
 import top.zynorl.transaction.fund.collection.service.CollectionService;
 import top.zynorl.transaction.fund.collection.sqlServer.entity.TransactionRecordDO;
-
-import java.util.List;
 
 /**
  * @version 1.0
@@ -25,6 +24,7 @@ public class CollectionListener {
     @Autowired
     private CollectionService collectionService;
     private static final String TOPIC = "mq-transaction";
+
     @KafkaListener(containerFactory = "manualImmediateListenerContainerFactory", topics = TOPIC)
     public void mq_transaction_listen(TransactionRecordDO message, Acknowledgment ack) {
         String TranId = message.getTransactionId();
@@ -33,9 +33,12 @@ public class CollectionListener {
             collectionService.doDeal(TranId, dataDTO);
         } catch (DuplicateKeyException e) {
             log.warn("重复消费，TranId=" + TranId);
+            ack.acknowledge();
+        } catch (TransactionSystemException e) {
+            log.error(e.getMessage());
         } finally {
             TransactionRecordDO transactionByTranId = collectionService.getTransactionByTranId(TranId);
-            if(transactionByTranId!=null&&TransactionStatusEnum.SUCCESS.getCode().equals(transactionByTranId.getStatus())){
+            if (transactionByTranId != null && TransactionStatusEnum.SUCCESS.getCode().equals(transactionByTranId.getStatus())) {
                 ack.acknowledge();
             }
         }

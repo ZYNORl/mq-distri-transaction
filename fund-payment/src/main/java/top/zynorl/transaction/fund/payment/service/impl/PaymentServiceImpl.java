@@ -5,8 +5,9 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.annotation.Transactional;
-import top.zynorl.transaction.fund.payment.enums.TransactionStatusEnum;
+import top.zynorl.transaction.fund.payment.pojo.enums.TransactionStatusEnum;
 import top.zynorl.transaction.fund.payment.pojo.dto.TransactionAmountDataDTO;
 import top.zynorl.transaction.fund.payment.pojo.req.DealAmountReq;
 import top.zynorl.transaction.fund.payment.service.PaymentService;
@@ -35,7 +36,7 @@ public class PaymentServiceImpl implements PaymentService {
         if(bankcard1DO!=null && bankcard1DO.getAmount()-dealAmountReq.getAmount()>=0){
             bankcard1DO.setAmount(bankcard1DO.getAmount()-dealAmountReq.getAmount());
             bankcard1DO.setTransactionId(transactionId);
-            bankcard1DOService.save(bankcard1DO);
+            bankcard1DOService.updateById(bankcard1DO);
             // 对transactionRecord新增事务记录
             TransactionAmountDataDTO dataDTO = TransactionAmountDataDTO.builder()
                     .cardNumber1(dealAmountReq.getCardNumber1()).cardNumber2(dealAmountReq.getCardNumber2()).amount(dealAmountReq.getAmount()).build();
@@ -44,7 +45,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .transactionId(transactionId).data(jsonStrData).status(TransactionStatusEnum.STARTED.getCode()).build();
             transactionRecordService.save(transactionRecordDO);
         }else{
-            throw new RuntimeException("无银行卡1信息或小于待操作amount："+dealAmountReq.getAmount());
+            throw new TransactionSystemException("无银行卡1信息或小于待操作amount："+dealAmountReq.getAmount());
         }
     }
 }

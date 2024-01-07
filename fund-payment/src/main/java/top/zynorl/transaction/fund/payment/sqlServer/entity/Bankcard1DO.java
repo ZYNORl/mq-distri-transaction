@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -18,6 +20,7 @@ import lombok.Data;
  * @since 2024-01-05
  */
 @Data
+@TableName("bankcard1")
 @Builder
 @ApiModel(value = "Bankcard1对象", description = "银行卡1，用于支付")
 public class Bankcard1DO implements Serializable {

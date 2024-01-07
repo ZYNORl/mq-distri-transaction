@@ -5,8 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.annotation.Transactional;
-import top.zynorl.transaction.fund.collection.enums.TransactionStatusEnum;
+import top.zynorl.transaction.fund.collection.pojo.enums.TransactionStatusEnum;
 import top.zynorl.transaction.fund.collection.pojo.dto.TransactionAmountDataDTO;
 import top.zynorl.transaction.fund.collection.service.CollectionService;
 import top.zynorl.transaction.fund.collection.sqlServer.entity.Bankcard2DO;
@@ -53,7 +54,7 @@ public class CollectionServiceImpl implements CollectionService {
             String logMeg = String.format("%s事务状态更新为:%s",tranId, TransactionStatusEnum.SUCCESS.getCode());
             log.info(logMeg);
         }else {
-            throw new RuntimeException("无事务信息，消费失败");
+            throw new TransactionSystemException("无事务信息，消费失败");
         }
     }
 }

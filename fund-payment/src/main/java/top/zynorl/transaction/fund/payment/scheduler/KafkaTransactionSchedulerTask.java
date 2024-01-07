@@ -8,8 +8,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.util.concurrent.ListenableFutureCallback;
-import top.zynorl.transaction.fund.payment.enums.TransactionStatusEnum;
+import top.zynorl.transaction.fund.payment.pojo.enums.TransactionStatusEnum;
 import top.zynorl.transaction.fund.payment.sqlServer.entity.TransactionRecordDO;
 import top.zynorl.transaction.fund.payment.sqlServer.service.ITransactionRecordService;
 
@@ -28,7 +29,7 @@ public class KafkaTransactionSchedulerTask {
     private KafkaTemplate<String,Object> kafkaTemplate;
     @Autowired
     private ITransactionRecordService transactionRecordService;
-    @Scheduled(fixedRate = 1000) // 一秒钟执行一次
+    @Scheduled(fixedRate = 2000) // 2秒钟执行一次
     public void executeTask() {
         QueryWrapper<TransactionRecordDO> tranWrapper = new QueryWrapper<>();
         QueryWrapper<TransactionRecordDO> eq = tranWrapper.
@@ -36,12 +37,12 @@ public class KafkaTransactionSchedulerTask {
         List<TransactionRecordDO> list = transactionRecordService.list(eq);
         list.forEach(transactionRecordDO -> {
             kafkaTemplate.send(TOPIC, transactionRecordDO).addCallback(new ListenableFutureCallback<SendResult<String, Object>>() {
-                @SneakyThrows
+
                 @Override
                 public void onFailure(Throwable throwable) {
                     String Msg = String.format("事务id【%s】发送失败:%s", transactionRecordDO.getTransactionId(), throwable.getMessage());
                     log.error(Msg);
-                    throw new RuntimeException();
+                    throw new TransactionSystemException(Msg);
                 }
 
                 @Override

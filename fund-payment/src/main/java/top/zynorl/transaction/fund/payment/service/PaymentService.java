@@ -9,7 +9,7 @@ import top.zynorl.transaction.fund.payment.pojo.req.DealAmountReq;
  **/
 public interface PaymentService {
     /**
-     * 交易
+     * 支付交易
      * @param dealAmountReq
      */
     void doDeal(DealAmountReq dealAmountReq);

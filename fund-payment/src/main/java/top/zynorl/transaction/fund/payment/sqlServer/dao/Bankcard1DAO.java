@@ -2,6 +2,7 @@ package top.zynorl.transaction.fund.payment.sqlServer.dao;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 import top.zynorl.transaction.fund.payment.sqlServer.entity.Bankcard1DO;
 
 /**
@@ -12,6 +13,7 @@ import top.zynorl.transaction.fund.payment.sqlServer.entity.Bankcard1DO;
  * @author zynorl/niuzy
  * @since 2024-01-05
  */
+@Mapper
 public interface Bankcard1DAO extends BaseMapper<Bankcard1DO> {
 
 }
