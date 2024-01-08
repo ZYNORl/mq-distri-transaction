@@ -54,7 +54,7 @@ public class CollectionServiceImpl implements CollectionService {
             String logMeg = String.format("%s事务状态更新为:%s",tranId, TransactionStatusEnum.SUCCESS.getCode());
             log.info(logMeg);
         }else {
-            throw new TransactionSystemException("无事务信息，消费失败");
+            throw new RuntimeException("无事务信息，消费失败");
         }
     }
 }

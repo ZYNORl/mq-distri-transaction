@@ -6,12 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionSystemException;
 import top.zynorl.transaction.fund.collection.pojo.dto.TransactionAmountDataDTO;
 import top.zynorl.transaction.fund.collection.pojo.enums.TransactionStatusEnum;
 import top.zynorl.transaction.fund.collection.service.CollectionService;
 import top.zynorl.transaction.fund.collection.sqlServer.entity.TransactionRecordDO;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @version 1.0
@@ -31,16 +34,20 @@ public class CollectionListener {
         TransactionAmountDataDTO dataDTO = JSONUtil.toBean(message.getData(), TransactionAmountDataDTO.class);
         try {
             collectionService.doDeal(TranId, dataDTO);
+            // 处理成功后确认消息
+            ack.acknowledge();
         } catch (DuplicateKeyException e) {
             log.warn("重复消费，TranId=" + TranId);
+            // 对于重复消费的情况，直接确认消息并返回true（因为这是预期情况而非错误）
             ack.acknowledge();
-        } catch (TransactionSystemException e) {
+        } catch (Exception e){
+            // 其他异常时，记录错误信息并触发重试
             log.error(e.getMessage());
-        } finally {
-            TransactionRecordDO transactionByTranId = collectionService.getTransactionByTranId(TranId);
-            if (transactionByTranId != null && TransactionStatusEnum.SUCCESS.getCode().equals(transactionByTranId.getStatus())) {
-                ack.acknowledge();
-            }
+            // TODO
+//            if (!retryService.retry(TranId, message)) {
+//                // 如果重试服务决定不再重试，或者重试次数已达到上限，则确认消息
+//                ack.acknowledge();
+//            }
         }
     }
 }

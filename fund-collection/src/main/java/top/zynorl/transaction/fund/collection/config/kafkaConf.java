@@ -17,6 +17,7 @@ import org.springframework.kafka.listener.ContainerProperties;
 public class kafkaConf {
     /**
      * MANUAL_IMMEDIATE 消费者手动确认并立即提交
+     *
      * @param consumerFactory
      * @return
      */
@@ -32,4 +33,5 @@ public class kafkaConf {
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
         return factory;
     }
+
 }
