@@ -12,9 +12,9 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr:  124.220.36.202:8848
+        server-addr:  localhost:8848
   kafka:
-    bootstrap-servers:  121.43.116.232:9092
+    bootstrap-servers:  localhost:9092
     producer:
       retries: 1
       batch-size: 16384
